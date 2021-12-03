@@ -79,7 +79,7 @@ class _LoginPageState extends State<LoginPage> {
                           )));
                 },
                 child: const Text(
-                  "Next",
+                  "Generate OTP",
                   style: TextStyle(
                       color: Colors.white, fontWeight: FontWeight.bold),
                 ),
