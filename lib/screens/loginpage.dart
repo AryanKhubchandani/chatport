@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-
 import 'package:country_code_picker/country_code_picker.dart';
+
+import 'package:chatport/screens/otppage.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -10,7 +11,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  String dialDigits = "";
+  String countryCode = "+91";
   final TextEditingController _controller = TextEditingController();
 
   @override
@@ -39,7 +40,7 @@ class _LoginPageState extends State<LoginPage> {
             CountryCodePicker(
               onChanged: (country) {
                 setState(() {
-                  dialDigits = country.dialCode!;
+                  countryCode = country.dialCode!;
                 });
               },
               initialSelection: "IN",
@@ -56,7 +57,7 @@ class _LoginPageState extends State<LoginPage> {
                     hintText: "Phone Number",
                     prefix: Padding(
                       padding: const EdgeInsets.all(5.0),
-                      child: Text(dialDigits),
+                      child: Text(countryCode),
                     ),
                   ),
                   maxLength: 10,
@@ -70,9 +71,15 @@ class _LoginPageState extends State<LoginPage> {
               margin: const EdgeInsets.all(25.0),
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (c) => OTPScreen(
+                            phone: _controller.text,
+                            code: countryCode,
+                          )));
+                },
                 child: const Text(
-                  "Verify",
+                  "Next",
                   style: TextStyle(
                       color: Colors.white, fontWeight: FontWeight.bold),
                 ),
