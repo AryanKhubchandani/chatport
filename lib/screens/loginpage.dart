@@ -65,7 +65,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
             ),
-            const SizedBox(height: 5ß0.0),
+            const SizedBox(height: 50.0),
             Container(
               margin: const EdgeInsets.all(25.0),
               width: double.infinity,
