@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:chatport/screens/messagepage.dart';
 
 class ChatBox extends StatefulWidget {
   String name;
@@ -22,7 +23,16 @@ class _ConversationListState extends State<ChatBox> {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {},
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) {
+              return MessagePage();
+            },
+          ),
+        );
+      },
       child: Container(
         padding:
             const EdgeInsets.only(left: 15, right: 15, top: 10, bottom: 10),
