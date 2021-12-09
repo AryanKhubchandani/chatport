@@ -1,4 +1,6 @@
+import 'package:chatport/screens/chatpage.dart';
 import 'package:chatport/screens/loginpage.dart';
+import 'package:chatport/screens/settings.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +13,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int _page = 1;
+  int _page = 0;
   late PageController _c;
 
   @override
@@ -52,10 +54,6 @@ class _HomePageState extends State<HomePage> {
         },
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Search',
-          ),
-          BottomNavigationBarItem(
             icon: Icon(Icons.chat),
             label: 'Chats',
           ),
@@ -72,7 +70,7 @@ class _HomePageState extends State<HomePage> {
             _page = newPage;
           });
         },
-        children: <Widget>[],
+        children: <Widget>[ChatPage(), Settings()],
       ),
     );
   }
