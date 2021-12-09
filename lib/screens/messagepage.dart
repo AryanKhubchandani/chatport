@@ -1,3 +1,4 @@
+import 'package:chatport/widgets/text_input.dart';
 import 'package:flutter/material.dart';
 
 class MessagePage extends StatefulWidget {
@@ -47,7 +48,7 @@ class MessagePageState extends State<MessagePage> {
           ],
         ),
       ),
-      body: Container(),
+      body: TextInput(),
     );
   }
 }
