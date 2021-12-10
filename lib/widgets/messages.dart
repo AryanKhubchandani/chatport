@@ -48,11 +48,43 @@ class Messages extends StatelessWidget {
                             : Colors.black),
                   ),
                 ),
+                const SizedBox(
+                  width: 5.0,
+                ),
+                if (messages[index].isSender) ...[
+                  Container(
+                    height: 15.0,
+                    width: 15.0,
+                    decoration: BoxDecoration(
+                      color: statusColor(messages[index].status),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                        messages[index].status == MessageStatus.not_sent
+                            ? Icons.close
+                            : Icons.done,
+                        color: Colors.white,
+                        size: 10.0),
+                  ),
+                ],
               ],
             ),
           );
         },
       ),
     );
+  }
+}
+
+Color statusColor(MessageStatus status) {
+  switch (status) {
+    case MessageStatus.not_sent:
+      return Colors.red;
+    case MessageStatus.sent:
+      return Colors.grey;
+    case MessageStatus.viewed:
+      return Colors.blue;
+    default:
+      return Colors.transparent;
   }
 }
