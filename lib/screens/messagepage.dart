@@ -1,3 +1,4 @@
+import 'package:chatport/widgets/messages.dart';
 import 'package:chatport/widgets/text_input.dart';
 import 'package:flutter/material.dart';
 
@@ -48,7 +49,12 @@ class MessagePageState extends State<MessagePage> {
           ],
         ),
       ),
-      body: TextInput(),
+      body: Column(
+        children: const [
+          Messages(),
+          TextInput(),
+        ],
+      ),
     );
   }
 }
