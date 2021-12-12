@@ -1,15 +1,53 @@
+import 'package:chatport/services/sharedpref.dart';
 import 'package:chatport/widgets/messages.dart';
 import 'package:chatport/widgets/text_input.dart';
 import 'package:flutter/material.dart';
 
 class MessagePage extends StatefulWidget {
-  const MessagePage({Key? key}) : super(key: key);
+  final String chatWithNumber, name, image;
+  MessagePage(
+    this.chatWithNumber,
+    this.name,
+    this.image,
+  );
 
   @override
   MessagePageState createState() => MessagePageState();
 }
 
 class MessagePageState extends State<MessagePage> {
+  String chatRoomId = '';
+  late String myName, myImage, myNumber = '';
+
+  getInfo() async {
+    myName = (await SharedPreferenceHelper().getDisplayName())!;
+    myImage = (await SharedPreferenceHelper().getUserProfileUrl())!;
+    myNumber = (await SharedPreferenceHelper().getPhoneNumber())!;
+
+    chatRoomId = getChatRoomID(widget.chatWithNumber, myNumber);
+  }
+
+  getChatRoomID(String a, b) {
+    if (a.substring(0, 1).codeUnitAt(0) > b.substring(0, 1).codeUnitAt(0)) {
+      return "$b\_$a";
+    } else {
+      return "$a\_$b";
+    }
+  }
+
+  getMessages() async {}
+
+  dothisOnLaunch() async {
+    await getInfo();
+    getMessages();
+  }
+
+  @override
+  void initState() {
+    dothisOnLaunch();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,11 +57,11 @@ class MessagePageState extends State<MessagePage> {
         title: Row(
           children: <Widget>[
             const BackButton(),
-            const CircleAvatar(
-              backgroundImage: NetworkImage(""),
+            CircleAvatar(
+              backgroundImage: NetworkImage(widget.image),
               maxRadius: 20,
             ),
-            SizedBox(
+            const SizedBox(
               width: 10.0,
             ),
             Expanded(
@@ -32,13 +70,13 @@ class MessagePageState extends State<MessagePage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Text(
-                    "Aryan",
-                    style: TextStyle(
+                    widget.name,
+                    style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
                         color: Colors.white),
                   ),
-                  SizedBox(height: 2.0),
+                  const SizedBox(height: 2.0),
                   Text(
                     "Online",
                     style: TextStyle(color: Colors.grey.shade300, fontSize: 14),
@@ -50,9 +88,9 @@ class MessagePageState extends State<MessagePage> {
         ),
       ),
       body: Column(
-        children: const [
+        children: [
           Messages(),
-          TextInput(),
+          TextInput(myNumber, chatRoomId),
         ],
       ),
     );
