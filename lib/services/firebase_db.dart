@@ -81,4 +81,8 @@ class DatabaseMethods {
         .where("phoneNumber", isEqualTo: phoneNumber)
         .get();
   }
+
+  Future<Stream<QuerySnapshot>> getUsers() async {
+    return FirebaseFirestore.instance.collection("users").snapshots();
+  }
 }
