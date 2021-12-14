@@ -29,20 +29,6 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Home Page"),
-        actions: [
-          IconButton(
-              onPressed: () async {
-                FirebaseAuth.instance.signOut();
-                SharedPreferences prefs = await SharedPreferences.getInstance();
-                prefs.clear();
-                Navigator.of(context)
-                    .push(MaterialPageRoute(builder: (c) => const LoginPage()));
-              },
-              icon: const Icon(Icons.logout))
-        ],
-      ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.shifting,
         unselectedIconTheme: IconThemeData(color: Colors.grey[400]),
