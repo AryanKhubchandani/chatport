@@ -1,8 +1,14 @@
+import 'dart:io';
+
 import 'package:chatport/screens/homepage.dart';
 import 'package:chatport/services/firebase_db.dart';
+import 'package:chatport/services/sharedpref.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:path/path.dart' as path;
 
 class ProfilePage extends StatefulWidget {
   final String phoneNumber;
@@ -14,11 +20,49 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  // String get _phoneNumber => widget.phoneNumber;
   final TextEditingController _nameController = TextEditingController();
   DocumentReference sightingRef = FirebaseFirestore.instance
       .collection("users")
       .doc(FirebaseAuth.instance.currentUser!.uid);
+  String url = '';
+  bool isUrlEmpty = true;
+
+  FirebaseStorage storage = FirebaseStorage.instance;
+
+  Future<void> _upload() async {
+    final picker = ImagePicker();
+
+    PickedFile? pickedImage;
+    try {
+      pickedImage = await picker.getImage(
+        source: ImageSource.gallery,
+      );
+
+      final String fileName = path.basename(pickedImage!.path);
+      File imageFile = File(pickedImage.path);
+
+      try {
+        Reference ref = storage.ref().child(widget.phoneNumber);
+
+        UploadTask uploadTask = ref.putFile(imageFile);
+        uploadTask.whenComplete(() async {
+          url = await ref.getDownloadURL();
+          SharedPreferenceHelper().saveUserProfileUrl(url);
+          setState(() {});
+        }).catchError((onError) {
+          print(onError);
+        });
+        setState(() {
+          isUrlEmpty = false;
+        });
+      } on FirebaseException catch (error) {
+        print(error);
+      }
+    } catch (err) {
+      print(err);
+    }
+  }
+
   @override
   void dispose() {
     _nameController.dispose();
@@ -78,13 +122,17 @@ class _ProfilePageState extends State<ProfilePage> {
     return Row(
       children: <Widget>[
         InkWell(
-          onTap: () {},
+          onTap: () {
+            _upload();
+          },
           child: Container(
             width: 50,
             height: 50,
             decoration: BoxDecoration(
                 color: Colors.grey.shade200, shape: BoxShape.circle),
-            child: const Icon(Icons.camera_alt, color: Colors.blue),
+            child: isUrlEmpty
+                ? const Icon(Icons.camera_alt, color: Colors.blue)
+                : CircleAvatar(backgroundImage: NetworkImage(url)),
           ),
         ),
         const SizedBox(
@@ -107,8 +155,9 @@ class _ProfilePageState extends State<ProfilePage> {
       Map<String, dynamic> userInfoMap = {
         'phoneNumber': widget.phoneNumber,
         'name': _nameController.text,
-        'imgUrl': '',
+        'imgUrl': url,
       };
+      SharedPreferenceHelper().saveDisplayName(_nameController.text);
       DatabaseMethods()
           .updateUserInfoToDB(
               FirebaseAuth.instance.currentUser!.uid, userInfoMap)
