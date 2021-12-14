@@ -1,4 +1,6 @@
+import 'package:chatport/screens/messagepage.dart';
 import 'package:chatport/services/firebase_db.dart';
+import 'package:chatport/services/sharedpref.dart';
 import 'package:chatport/widgets/chat_box.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +14,22 @@ class _ChatPageState extends State<ChatPage> {
   bool onSearching = false;
   bool onSearched = false;
   TextEditingController searchController = TextEditingController();
-  late Stream<QuerySnapshot> userStream;
+  late Stream<QuerySnapshot> userStream, chatUserStream;
+  late String myName, myImage, myNumber;
+
+  getInfo() async {
+    myName = (await SharedPreferenceHelper().getDisplayName())!;
+    myImage = (await SharedPreferenceHelper().getUserProfileUrl())!;
+    myNumber = (await SharedPreferenceHelper().getPhoneNumber())!;
+  }
+
+  getChatRoomID(String a, b) {
+    if (int.parse(a) > int.parse(b)) {
+      return "$b\_$a";
+    } else {
+      return "$a\_$b";
+    }
+  }
 
   onSearch() async {
     onSearching = true;
@@ -23,17 +40,39 @@ class _ChatPageState extends State<ChatPage> {
     });
   }
 
-  Widget searchUserTile(
-      String name, image /*, message, time, online, bool isMessageRead*/) {
+  Widget searchUserTile({name, image, number}
+      /*, message, time, online, bool isMessageRead*/
+      ) {
     if (name != "") {
-      return ChatBox(
+      return InkWell(
+        onTap: () {
+          var chatRoomId = getChatRoomID(myNumber, number);
+
+          Map<String, dynamic> chatRoomInfoMap = {
+            "users": [myNumber, number]
+          };
+          DatabaseMethods().createChatRoom(chatRoomId, chatRoomInfoMap);
+
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) {
+                return MessagePage(number, name, image);
+              },
+            ),
+          );
+        },
+        child: ChatBox(
           name: name,
+          number: number,
           message:
               "Hey,f dksfj;dalsk fjldksa jaf;ldskj flkdsaj f;ol fkdsj ;fdklsj",
           image: image,
           time: "5",
           online: true,
-          isMessageRead: false);
+          isMessageRead: false,
+        ),
+      );
     } else
       return Container();
   }
@@ -48,27 +87,68 @@ class _ChatPageState extends State<ChatPage> {
                   itemCount: snapshot.data!.docs.length,
                   itemBuilder: (context, index) {
                     DocumentSnapshot ds = snapshot.data!.docs[index];
-                    return searchUserTile(ds['name'], ds['imgUrl']);
+                    return searchUserTile(
+                        name: ds['name'],
+                        image: ds['imgUrl'],
+                        number: ds['phoneNumber']);
                   })
               : const Center(child: CircularProgressIndicator());
         });
   }
 
   Widget chatUsers() {
-    return ListView.builder(
-      itemCount: 10,
-      shrinkWrap: true,
-      padding: const EdgeInsets.only(top: 15),
-      physics: const NeverScrollableScrollPhysics(),
-      itemBuilder: (BuildContext context, index) => ChatBox(
-          name: "Aryan",
-          message:
-              "Hey,f dksfj;dalsk fjldksa jaf;ldskj flkdsaj f;ol fkdsj ;fdklsj",
-          image: "image",
-          time: "5",
-          online: true,
-          isMessageRead: false),
-    );
+    return StreamBuilder<QuerySnapshot>(
+        stream: chatUserStream,
+        builder: (context, snapshot) {
+          return snapshot.hasData
+              ? ListView.builder(
+                  itemCount: snapshot.data!.docs.length,
+                  shrinkWrap: true,
+                  padding: const EdgeInsets.only(top: 15),
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemBuilder: (BuildContext context, index) {
+                    DocumentSnapshot ds = snapshot.data!.docs[index];
+                    return ChatTile(ds.id, ds['lastMessage'], myNumber);
+                    // return InkWell(
+                    //   onTap: () {
+                    //     // Navigator.push(
+                    //     //   context,
+                    //     //   MaterialPageRoute(
+                    //     //     builder: (context) {
+                    //     //       return MessagePage(number, name, image);
+                    //     //     },
+                    //     //   ),
+                    //     // );
+                    //   },
+                    //   child: ChatBox(
+                    //       name: uName,
+                    //       number: uNumber,
+                    //       message: ds['lastMessage'],
+                    //       image: uImgUrl,
+                    //       time: "5",
+                    //       online: true,
+                    //       isMessageRead: false),
+                    // );
+                  })
+              : Center(child: CircularProgressIndicator());
+        });
+  }
+
+  getChatStream() async {
+    chatUserStream = await DatabaseMethods().getChatRooms();
+    setState(() {});
+  }
+
+  onScreenLoaded() async {
+    await getInfo();
+    getChatStream();
+  }
+
+  @override
+  void initState() {
+    onScreenLoaded();
+    // getThisUserInfo();
+    super.initState();
   }
 
   @override
@@ -170,6 +250,126 @@ class _ChatPageState extends State<ChatPage> {
               // ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class ChatTile extends StatefulWidget {
+  final String chatId, message, myNumber;
+
+  ChatTile(this.chatId, this.message, this.myNumber);
+  @override
+  _ChatTileState createState() => _ChatTileState();
+}
+
+class _ChatTileState extends State<ChatTile> {
+  String uImgUrl = '', uName = '', uNumber = '';
+  getThisUserInfo() async {
+    uNumber = widget.chatId.replaceAll(widget.myNumber, "").replaceAll("_", "");
+
+    QuerySnapshot query = await DatabaseMethods().getUserInfo(uNumber);
+    print("$uNumber");
+    uName = query.docs[0]['name'];
+    uImgUrl = query.docs[0]['imgUrl'];
+
+    print("WHATTTTISSS ${query.docs}");
+    print("WHATTTT ${query.docs[0]['name']}");
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    getThisUserInfo();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) {
+              return MessagePage(uNumber, uName, uImgUrl);
+            },
+          ),
+        );
+      },
+      child: Container(
+        padding:
+            const EdgeInsets.only(left: 15, right: 15, top: 10, bottom: 10),
+        child: Row(
+          children: <Widget>[
+            Expanded(
+              child: Row(
+                children: <Widget>[
+                  Stack(
+                    alignment: Alignment.bottomRight,
+                    children: [
+                      CircleAvatar(
+                        backgroundImage: NetworkImage(uImgUrl),
+                        maxRadius: 30,
+                      ),
+                      // if (widget.online == true)
+                      //   Container(
+                      //     height: 15,
+                      //     width: 16,
+                      //     decoration: BoxDecoration(
+                      //         color: Colors.green,
+                      //         shape: BoxShape.circle,
+                      //         border: Border.all(
+                      //           color: Colors.white,
+                      //           width: 2.0,
+                      //         )),
+                      //   ),
+                    ],
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 15.0),
+                      child: Container(
+                        color: Colors.transparent,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text(
+                              uName,
+                              style: TextStyle(fontSize: 16),
+                            ),
+                            SizedBox(
+                              height: 6,
+                            ),
+                            Text(
+                              widget.message,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.grey.shade600,
+                                // fontWeight: widget.isMessageRead
+                                //     ? FontWeight.bold
+                                //     : FontWeight.normal),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // Text(
+            //   widget.time,
+            //   style: TextStyle(
+            //       fontSize: 12,
+            //       fontWeight:
+            //           widget.isMessageRead ? FontWeight.bold : FontWeight.normal),
+            // ),
+          ],
         ),
       ),
     );

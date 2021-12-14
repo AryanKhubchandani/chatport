@@ -4,6 +4,7 @@ import 'package:chatport/screens/settings.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -32,8 +33,10 @@ class _HomePageState extends State<HomePage> {
         title: const Text("Home Page"),
         actions: [
           IconButton(
-              onPressed: () {
+              onPressed: () async {
                 FirebaseAuth.instance.signOut();
+                SharedPreferences prefs = await SharedPreferences.getInstance();
+                prefs.clear();
                 Navigator.of(context)
                     .push(MaterialPageRoute(builder: (c) => const LoginPage()));
               },

@@ -1,3 +1,6 @@
+import 'package:chatport/screens/profilepage.dart';
+import 'package:chatport/services/firebase_db.dart';
+import 'package:chatport/services/sharedpref.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pinput/pin_put/pin_put.dart';
@@ -39,20 +42,42 @@ class _OTPScreenState extends State<OTPScreen> {
     await FirebaseAuth.instance.verifyPhoneNumber(
         phoneNumber: widget.code + widget.phone,
         verificationCompleted: (PhoneAuthCredential credential) async {
-          await FirebaseAuth.instance
-              .signInWithCredential(credential)
-              .then((value) {
-            if (value.user != null) {
-              Navigator.of(context)
-                  .push(MaterialPageRoute(builder: (c) => HomePage()));
-            }
-          });
+          await FirebaseAuth.instance.signInWithCredential(credential).then(
+            (value) {
+              User userDetails = value.user as User;
+              if (value.user != null) {
+                SharedPreferenceHelper().saveUserId(userDetails.uid);
+                SharedPreferenceHelper()
+                    .savePhoneNumber(userDetails.phoneNumber.toString());
+                SharedPreferenceHelper()
+                    .saveDisplayName(userDetails.displayName.toString());
+                SharedPreferenceHelper()
+                    .saveUserProfileUrl(userDetails.photoURL.toString());
+
+                Map<String, dynamic> userInfoMap = {
+                  "phoneNumber": userDetails.phoneNumber,
+                  "name": userDetails.displayName,
+                  "imgUrl": userDetails.photoURL
+                };
+                DatabaseMethods()
+                    .addUserInfoToDB(userDetails.uid, userInfoMap)
+                    .then((value) {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                        builder: (c) => ProfilePage(
+                              phoneNumber: widget.code + widget.phone,
+                            )),
+                  );
+                });
+              }
+            },
+          );
         },
         verificationFailed: (FirebaseAuthException e) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(e.message.toString()),
-              duration: const Duration(seconds: 2),
+              duration: const Duration(seconds: 3),
             ),
           );
         },
@@ -110,12 +135,40 @@ class _OTPScreenState extends State<OTPScreen> {
                   await FirebaseAuth.instance
                       .signInWithCredential(PhoneAuthProvider.credential(
                           verificationId: verificationCode!, smsCode: pin))
-                      .then((value) {
-                    if (value.user != null) {
-                      Navigator.of(context)
-                          .push(MaterialPageRoute(builder: (c) => HomePage()));
-                    }
-                  });
+                      .then(
+                    (value) {
+                      User userDetails = value.user as User;
+                      if (value.user != null) {
+                        // SharedPreferenceHelper()
+                        // .saveUserEmail(userDetails.email.toString());
+                        SharedPreferenceHelper().saveUserId(userDetails.uid);
+                        // SharedPreferenceHelper()
+                        //     .saveUserName(userDetails.email.replaceAll("@gmail.com", ""));
+                        SharedPreferenceHelper().savePhoneNumber(
+                            userDetails.phoneNumber.toString());
+                        SharedPreferenceHelper().saveDisplayName(
+                            userDetails.displayName.toString());
+                        SharedPreferenceHelper().saveUserProfileUrl(
+                            userDetails.photoURL.toString());
+
+                        Map<String, dynamic> userInfoMap = {
+                          "phoneNumber": userDetails.phoneNumber,
+                          "name": userDetails.displayName,
+                          "imgUrl": userDetails.photoURL
+                        };
+                        DatabaseMethods()
+                            .addUserInfoToDB(userDetails.uid, userInfoMap)
+                            .then((value) {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                                builder: (c) => ProfilePage(
+                                      phoneNumber: widget.code + widget.phone,
+                                    )),
+                          );
+                        });
+                      }
+                    },
+                  );
                 } catch (e) {
                   FocusScope.of(context).unfocus();
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -145,5 +198,14 @@ class _OTPScreenState extends State<OTPScreen> {
         ],
       ),
     );
+  }
+}
+
+class AuthMethods {
+  final FirebaseAuth auth = FirebaseAuth.instance;
+
+  //get current user
+  getCurrentUser() async {
+    return auth.currentUser;
   }
 }
