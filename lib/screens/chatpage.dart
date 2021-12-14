@@ -152,6 +152,11 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
@@ -270,12 +275,9 @@ class _ChatTileState extends State<ChatTile> {
     uNumber = widget.chatId.replaceAll(widget.myNumber, "").replaceAll("_", "");
 
     QuerySnapshot query = await DatabaseMethods().getUserInfo(uNumber);
-    print("$uNumber");
     uName = query.docs[0]['name'];
     uImgUrl = query.docs[0]['imgUrl'];
 
-    print("WHATTTTISSS ${query.docs}");
-    print("WHATTTT ${query.docs[0]['name']}");
     setState(() {});
   }
 

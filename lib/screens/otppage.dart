@@ -46,13 +46,8 @@ class _OTPScreenState extends State<OTPScreen> {
             (value) {
               User userDetails = value.user as User;
               if (value.user != null) {
-                SharedPreferenceHelper().saveUserId(userDetails.uid);
                 SharedPreferenceHelper()
                     .savePhoneNumber(userDetails.phoneNumber.toString());
-                SharedPreferenceHelper()
-                    .saveDisplayName(userDetails.displayName.toString());
-                SharedPreferenceHelper()
-                    .saveUserProfileUrl(userDetails.photoURL.toString());
 
                 Map<String, dynamic> userInfoMap = {
                   "phoneNumber": userDetails.phoneNumber,
@@ -139,17 +134,8 @@ class _OTPScreenState extends State<OTPScreen> {
                     (value) {
                       User userDetails = value.user as User;
                       if (value.user != null) {
-                        // SharedPreferenceHelper()
-                        // .saveUserEmail(userDetails.email.toString());
-                        SharedPreferenceHelper().saveUserId(userDetails.uid);
-                        // SharedPreferenceHelper()
-                        //     .saveUserName(userDetails.email.replaceAll("@gmail.com", ""));
                         SharedPreferenceHelper().savePhoneNumber(
                             userDetails.phoneNumber.toString());
-                        SharedPreferenceHelper().saveDisplayName(
-                            userDetails.displayName.toString());
-                        SharedPreferenceHelper().saveUserProfileUrl(
-                            userDetails.photoURL.toString());
 
                         Map<String, dynamic> userInfoMap = {
                           "phoneNumber": userDetails.phoneNumber,

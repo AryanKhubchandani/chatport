@@ -1,7 +1,6 @@
 import 'package:chatport/services/firebase_db.dart';
 import 'package:chatport/services/sharedpref.dart';
 import 'package:chatport/widgets/chat_box.dart';
-import 'package:chatport/widgets/messages.dart';
 import 'package:chatport/widgets/text_input.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
