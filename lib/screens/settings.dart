@@ -124,7 +124,7 @@ class _SettingsState extends State<Settings> {
                       hintText: myNumber,
                     ),
                   ),
-                  const SizedBox(height: 120.0),
+                  const SizedBox(height: 80.0),
                   ElevatedButton(
                       onPressed: () async {
                         FirebaseAuth.instance.signOut();
@@ -150,7 +150,7 @@ class _SettingsState extends State<Settings> {
 
     FirebaseFirestore.instance
         .collection("users")
-        .doc(myNumber)
+        .doc(FirebaseAuth.instance.currentUser!.uid)
         .update({'imgUrl': SharedPreferenceHelper().getUserProfileUrl()});
   }
 
