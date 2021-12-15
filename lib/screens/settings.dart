@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:chatport/screens/loginpage.dart';
-import 'package:chatport/services/firebase_db.dart';
 import 'package:chatport/services/sharedpref.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -11,12 +10,12 @@ import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:path/path.dart' as path;
 
-class Settings extends StatefulWidget {
+class SettingsPage extends StatefulWidget {
   @override
-  _SettingsState createState() => _SettingsState();
+  _SettingsPageState createState() => _SettingsPageState();
 }
 
-class _SettingsState extends State<Settings> {
+class _SettingsPageState extends State<SettingsPage> {
   TextEditingController nameController = TextEditingController();
   String myName = '', myImage = '', myNumber = '';
   getInfo() async {
