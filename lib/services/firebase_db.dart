@@ -15,7 +15,7 @@ class DatabaseMethods {
     return FirebaseFirestore.instance
         .collection("users")
         .doc(userId)
-        .set(userInfoMap);
+        .update(userInfoMap);
   }
 
   Future<Stream<QuerySnapshot>> getUserByPhoneNumber(String phoneNumber) async {

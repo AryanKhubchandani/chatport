@@ -1,12 +1,10 @@
 import 'package:chatport/screens/chatpage.dart';
 import 'package:chatport/screens/findpage.dart';
-import 'package:chatport/screens/loginpage.dart';
 import 'package:chatport/screens/settings.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -15,17 +13,34 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   int _page = 1;
   late PageController _c;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance!.addObserver(this);
+
     _c = PageController(
       keepPage: true,
       initialPage: _page,
     );
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
+    if (state == AppLifecycleState.resumed) {
+      await FirebaseFirestore.instance
+          .collection("users")
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .update({'isOnline': 'online'});
+    } else {
+      await FirebaseFirestore.instance
+          .collection("users")
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .update({'isOnline': 'offline'});
+    }
   }
 
   @override
@@ -65,7 +80,7 @@ class _HomePageState extends State<HomePage> {
             _page = newPage;
           });
         },
-        children: <Widget>[FindPage(), ChatPage(), Settings()],
+        children: <Widget>[FindPage(), ChatPage(), SettingsPage()],
       ),
     );
   }

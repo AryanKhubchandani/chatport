@@ -2,7 +2,6 @@ import 'package:chatport/screens/findpage.dart';
 import 'package:chatport/screens/messagepage.dart';
 import 'package:chatport/services/firebase_db.dart';
 import 'package:chatport/services/sharedpref.dart';
-import 'package:chatport/widgets/chat_box.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -41,9 +40,7 @@ class _ChatPageState extends State<ChatPage> {
     });
   }
 
-  Widget searchUserTile({name, image, number}
-      /*, message, time, online, bool isMessageRead*/
-      ) {
+  Widget searchUserTile({name, image, number}) {
     if (name != "") {
       return InkWell(
         onTap: () {
@@ -216,13 +213,14 @@ class ChatTile extends StatefulWidget {
 }
 
 class _ChatTileState extends State<ChatTile> {
-  String uImgUrl = '', uName = '', uNumber = '';
+  String uImgUrl = '', uName = '', uNumber = '', uIsOnline = '';
   getThisUserInfo() async {
     uNumber = widget.chatId.replaceAll(widget.myNumber, "").replaceAll("_", "");
 
     QuerySnapshot query = await DatabaseMethods().getUserInfo(uNumber);
     uName = query.docs[0]['name'];
     uImgUrl = query.docs[0]['imgUrl'];
+    uIsOnline = query.docs[0]['isOnline'];
 
     setState(() {});
   }
@@ -261,18 +259,18 @@ class _ChatTileState extends State<ChatTile> {
                         backgroundImage: NetworkImage(uImgUrl),
                         maxRadius: 30,
                       ),
-                      // if (widget.online == true)
-                      //   Container(
-                      //     height: 15,
-                      //     width: 16,
-                      //     decoration: BoxDecoration(
-                      //         color: Colors.green,
-                      //         shape: BoxShape.circle,
-                      //         border: Border.all(
-                      //           color: Colors.white,
-                      //           width: 2.0,
-                      //         )),
-                      //   ),
+                      if (uIsOnline == 'online')
+                        Container(
+                          height: 15,
+                          width: 16,
+                          decoration: BoxDecoration(
+                              color: Colors.green,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: Colors.white,
+                                width: 2.0,
+                              )),
+                        ),
                     ],
                   ),
                   Expanded(

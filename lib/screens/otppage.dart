@@ -1,11 +1,10 @@
 import 'package:chatport/screens/profilepage.dart';
 import 'package:chatport/services/firebase_db.dart';
 import 'package:chatport/services/sharedpref.dart';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:pinput/pin_put/pin_put.dart';
-
-import 'package:chatport/screens/homepage.dart';
 
 class OTPScreen extends StatefulWidget {
   final String phone;
@@ -21,6 +20,7 @@ class _OTPScreenState extends State<OTPScreen> {
   final GlobalKey<ScaffoldState> _scaffoldkey = GlobalKey<ScaffoldState>();
   final TextEditingController _otpController = TextEditingController();
   final FocusNode _otpFocus = FocusNode();
+  String online = '';
 
   String? verificationCode;
 
@@ -52,7 +52,8 @@ class _OTPScreenState extends State<OTPScreen> {
                 Map<String, dynamic> userInfoMap = {
                   "phoneNumber": userDetails.phoneNumber,
                   "name": userDetails.displayName,
-                  "imgUrl": userDetails.photoURL
+                  "imgUrl": userDetails.photoURL,
+                  "isOnline": online,
                 };
                 DatabaseMethods()
                     .addUserInfoToDB(userDetails.uid, userInfoMap)

@@ -20,13 +20,14 @@ class MessagePageState extends State<MessagePage> {
   String chatRoomId = '';
   late Stream<QuerySnapshot> messageStream;
   late String myName, myImage, myNumber = '';
+  late QuerySnapshot query;
 
   getInfo() async {
     myName = (await SharedPreferenceHelper().getDisplayName())!;
     myImage = (await SharedPreferenceHelper().getUserProfileUrl())!;
     myNumber = (await SharedPreferenceHelper().getPhoneNumber())!;
-
     chatRoomId = getChatRoomID(widget.chatWithNumber, myNumber);
+    query = await DatabaseMethods().getUserInfo(widget.chatWithNumber);
   }
 
   getChatRoomID(String a, b) {
@@ -111,7 +112,7 @@ class MessagePageState extends State<MessagePage> {
                         );
                       }),
                 )
-              : Center(child: CircularProgressIndicator());
+              : const Center(child: CircularProgressIndicator());
         });
   }
 
@@ -160,9 +161,19 @@ class MessagePageState extends State<MessagePage> {
                         color: Colors.white),
                   ),
                   const SizedBox(height: 2.0),
-                  Text(
-                    "",
-                    style: TextStyle(color: Colors.grey.shade300, fontSize: 14),
+                  StreamBuilder<QuerySnapshot>(
+                    stream: FirebaseFirestore.instance
+                        .collection('users')
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      return snapshot.hasData
+                          ? Text(
+                              query.docs[0]['isOnline'],
+                              style: TextStyle(
+                                  color: Colors.grey.shade300, fontSize: 14),
+                            )
+                          : const Center(child: CircularProgressIndicator());
+                    },
                   ),
                 ],
               ),
