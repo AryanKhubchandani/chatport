@@ -3,6 +3,7 @@ import 'package:chatport/screens/findpage.dart';
 import 'package:chatport/screens/loginpage.dart';
 import 'package:chatport/screens/settings.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -74,7 +75,7 @@ class _HomePageState extends State<HomePage> {
       case 0:
         return Colors.blue;
       case 1:
-        return Colors.blue;
+        return Colors.green;
       case 2:
         return Colors.black;
       default:

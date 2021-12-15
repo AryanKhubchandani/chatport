@@ -109,26 +109,6 @@ class _ChatPageState extends State<ChatPage> {
                   itemBuilder: (BuildContext context, index) {
                     DocumentSnapshot ds = snapshot.data!.docs[index];
                     return ChatTile(ds.id, ds['lastMessage'], myNumber);
-                    // return InkWell(
-                    //   onTap: () {
-                    //     // Navigator.push(
-                    //     //   context,
-                    //     //   MaterialPageRoute(
-                    //     //     builder: (context) {
-                    //     //       return MessagePage(number, name, image);
-                    //     //     },
-                    //     //   ),
-                    //     // );
-                    //   },
-                    //   child: ChatBox(
-                    //       name: uName,
-                    //       number: uNumber,
-                    //       message: ds['lastMessage'],
-                    //       image: uImgUrl,
-                    //       time: "5",
-                    //       online: true,
-                    //       isMessageRead: false),
-                    // );
                   })
               : Center(child: CircularProgressIndicator());
         });
@@ -147,7 +127,6 @@ class _ChatPageState extends State<ChatPage> {
   @override
   void initState() {
     onScreenLoaded();
-    // getThisUserInfo();
     super.initState();
   }
 
@@ -166,25 +145,12 @@ class _ChatPageState extends State<ChatPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              SafeArea(
+              const SafeArea(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        "Chats",
-                        style: TextStyle(
-                            fontSize: 32, fontWeight: FontWeight.bold),
-                      ),
-                      FloatingActionButton(
-                        onPressed: () {},
-                        child: const Icon(
-                          Icons.person_add,
-                        ),
-                        mini: true,
-                      ),
-                    ],
+                  padding: EdgeInsets.symmetric(vertical: 10.0),
+                  child: Text(
+                    "Chats",
+                    style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
                   ),
                 ),
               ),
@@ -193,7 +159,7 @@ class _ChatPageState extends State<ChatPage> {
                 child: TextField(
                   controller: searchController,
                   decoration: InputDecoration(
-                    hintText: "Search...",
+                    hintText: "Search Number...",
                     hintStyle: TextStyle(color: Colors.grey[600]),
                     prefixIcon: Icon(
                       Icons.search,
@@ -222,7 +188,7 @@ class _ChatPageState extends State<ChatPage> {
                         borderSide: const BorderSide(color: Colors.white)),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(15),
-                      borderSide: const BorderSide(color: Colors.blue),
+                      borderSide: const BorderSide(color: Colors.green),
                     ),
                   ),
                   onTap: () {
@@ -232,27 +198,15 @@ class _ChatPageState extends State<ChatPage> {
                   },
                   onSubmitted: (value) {
                     setState(() {
-                      onSearched = true;
-                      onSearch();
+                      if (value.isNotEmpty) {
+                        onSearched = true;
+                        onSearch();
+                      }
                     });
                   },
                 ),
               ),
               onSearched ? searchUsers() : chatUsers(),
-              // ListView.builder(
-              //   itemCount: 10,
-              //   shrinkWrap: true,
-              //   padding: const EdgeInsets.only(top: 15),
-              //   physics: const NeverScrollableScrollPhysics(),
-              //   itemBuilder: (BuildContext context, index) => ChatBox(
-              //       name: "Aryan",
-              //       message:
-              //           "Hey,f dksfj;dalsk fjldksa jaf;ldskj flkdsaj f;ol fkdsj ;fdklsj",
-              //       image: "image",
-              //       time: "5",
-              //       online: true,
-              //       isMessageRead: false),
-              // ),
             ],
           ),
         ),

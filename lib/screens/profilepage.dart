@@ -131,7 +131,7 @@ class _ProfilePageState extends State<ProfilePage> {
             decoration: BoxDecoration(
                 color: Colors.grey.shade200, shape: BoxShape.circle),
             child: isUrlEmpty
-                ? const Icon(Icons.camera_alt, color: Colors.blue)
+                ? const Icon(Icons.camera_alt, color: Colors.indigo)
                 : CircleAvatar(backgroundImage: NetworkImage(url)),
           ),
         ),

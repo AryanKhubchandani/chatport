@@ -45,7 +45,7 @@ class _ConversationListState extends State<ChatBox> {
                         height: 15,
                         width: 16,
                         decoration: BoxDecoration(
-                            color: Colors.green,
+                            color: Colors.indigo,
                             shape: BoxShape.circle,
                             border: Border.all(
                               color: Colors.white,
