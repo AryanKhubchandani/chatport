@@ -161,7 +161,7 @@ class MessagePageState extends State<MessagePage> {
                   ),
                   const SizedBox(height: 2.0),
                   Text(
-                    "Online",
+                    "",
                     style: TextStyle(color: Colors.grey.shade300, fontSize: 14),
                   ),
                 ],

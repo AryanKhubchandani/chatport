@@ -1,3 +1,4 @@
+import 'package:chatport/screens/findpage.dart';
 import 'package:chatport/screens/messagepage.dart';
 import 'package:chatport/services/firebase_db.dart';
 import 'package:chatport/services/sharedpref.dart';
@@ -62,16 +63,7 @@ class _ChatPageState extends State<ChatPage> {
             ),
           );
         },
-        child: ChatBox(
-          name: name,
-          number: number,
-          message:
-              "Hey,f dksfj;dalsk fjldksa jaf;ldskj flkdsaj f;ol fkdsj ;fdklsj",
-          image: image,
-          time: "5",
-          online: true,
-          isMessageRead: false,
-        ),
+        child: UserTile(number),
       );
     } else
       return Container();
